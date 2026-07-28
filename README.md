@@ -1,2 +1,2 @@
 # Crello
-A simplified Trello-style task manager (MERN stack) with boards, lists, cards, and shared team boards.
+A simplified Trello-style task management app — boards, lists, and cards, with support for both personal (individual) boards and shared team boards. Built with the MERN stack (MongoDB, Express, React, Node) as a personal full-stack project.
