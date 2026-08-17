@@ -15,6 +15,12 @@ mongoose.connect(process.env.MONGO_URI)
 
 app.use(express.json()); 
 
+// Allows Cross-Origin Resource Sharing (CORS)
+const cors = require('cors');
+
+app.use(express.json());
+app.use(cors());
+
 // Auth Route
 app.use('/api/auth', authRoutes);
 

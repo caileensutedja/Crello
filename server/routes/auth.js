@@ -25,11 +25,22 @@ router.post('/signup', async (req, res) => {
     const passwordHash = await bcrypt.hash(password, 10);     // 10 describes how much computational effort goes into the hash
     const user = await User.create({ name, email, passwordHash });
 
-    // Do not send password back
+    // Create JWT token for auto-login after signup (same as login route)
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    // Return token + user info, matching the login route format
+    // This allows the frontend to auto-login new users after signup
     res.status(201).json({
-      id: user._id,
-      name: user.name,
-      email: user.email,
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      },
     });
   } catch (err) {
     console.error(err);
