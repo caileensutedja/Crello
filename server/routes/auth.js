@@ -65,9 +65,10 @@ router.post('/login', async (req, res) => {
       { expiresIn: '7d' }
     );
 
+    // Send back the token
     res.json({
-      token,
-      user: {
+      token, // JWT string, frontend saves to localStorage
+      user: { // user info
         id: user._id,
         name: user.name,
         email: user.email,
