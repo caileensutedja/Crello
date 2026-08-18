@@ -60,4 +60,32 @@ router.get('/:boardId/lists', authMiddleware, async (req, res) => {
     }
 });
 
+// PUT /api/boards/:boardId/lists - Update the list
+router.put('/:boardId/lists/:listId', authMiddleware, async (req, res) => {
+    try {
+        const { boardId, listId } = req.params
+        const userId = req.user.userId;
+        const { title, position } = req.body;
+
+
+        // Check if the user owns the board
+        const owner = await BoardMember.findOne({ boardId, userId });
+        if (!owner || owner.role !== 'owner') {
+            return res.status(403).json({ error: 'Only board owner can view the list' });
+        }
+
+        // Update the board
+        const updatedList = await List.findByIdAndUpdate(
+            listId,
+            { title, position },
+            { new: true } // Return the updated document
+        );
+
+        res.json(updatedList);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Something went wrong' });
+    }
+});
+
 module.exports = router;
