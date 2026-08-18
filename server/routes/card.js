@@ -87,4 +87,26 @@ router.put('/:boardId/lists/:listId/cards/:cardId', authMiddleware, async (req, 
     }
 });
 
+// DELETE /api/boards/:boardId/lists/:listId/cards/:cardId - Delete a card
+router.delete('/:boardId/lists/:listId/cards/:cardId', authMiddleware, async (req, res) => {
+    try {
+        const { boardId, cardId } = req.params;
+        const userId = req.user.userId;
+
+        // Check permission (BoardMember)
+        const member = await BoardMember.findOne({ boardId, userId });
+        if (!member || member.role !== 'owner') {
+            return res.status(403).json({ error: 'Only board owner can delete cards' });
+        }
+        
+        // Delete the card
+        await Card.findByIdAndDelete(cardId);
+        
+        res.json({ message: 'Card deleted'})
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Something went wrong' });
+    }
+});
+
 module.exports = router;
