@@ -60,4 +60,31 @@ router.get('/:boardId/lists/:listId/cards', authMiddleware, async (req, res) => 
     }
 });
 
+// PUT /api/boards/:boardId/lists/:listId/cards/:cardId - Update a card
+router.put('/:boardId/lists/:listId/cards/:cardId', authMiddleware, async (req, res) => {
+    try {
+        const { boardId, cardId } = req.params;
+        const userId = req.user.userId;
+        const { title, description, position } = req.body;
+
+        // Check permission (BoardMember)
+        const member = await BoardMember.findOne({ boardId, userId });
+        if (!member || member.role !== 'owner') {
+            return res.status(403).json({ error: 'Only board owner can edit cards' });
+        }
+        
+        // Update the card
+        const updatedCard = await Card.findByIdAndUpdate(
+            cardId,
+            { title, description, position },
+            { new: true } // Return the updated document
+        );
+
+        res.json(updatedCard)
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Something went wrong' });
+    }
+});
+
 module.exports = router;
