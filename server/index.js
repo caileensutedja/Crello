@@ -2,6 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const boardRoutes = require('./routes/boards');
+const listRoutes = require('./routes/lists');
+const cardRoutes = require('./routes/cards');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,6 +28,12 @@ app.use('/api/auth', authRoutes);
 
 // Board Route
 app.use('/api/boards', boardRoutes);
+
+// List Route
+app.use('/api/boards', listRoutes);
+
+// Card Route
+app.use('/api/boards', cardRoutes);
 
 // Test Ping Route
 app.get('/api/ping', (req, res) => {
