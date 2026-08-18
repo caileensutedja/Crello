@@ -13,6 +13,11 @@ export function BoardsPage() {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
 
+    // State for editing board
+    const [editingBoardId, setEditingBoardId] = useState<string | null>(null);
+    const [editTitle, setEditTitle] = useState('');
+    const [editDescription, setEditDescription] = useState('');
+
     // Get auth data
     const { user, token, logout } = useAuth();
     const navigate = useNavigate();
@@ -88,6 +93,46 @@ export function BoardsPage() {
     } catch (err) {
         setError((err as Error).message);
     }
+    };
+
+    // Handle edit board
+    const handleEditBoard = async (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        if (!editingBoardId) return;
+        
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/boards/${editingBoardId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ title: editTitle, description: editDescription })
+            });
+            
+            if (!response.ok) throw new Error('Failed to update board');
+            
+            // Clear edit state and refresh
+            setEditingBoardId(null);
+            setEditTitle('');
+            setEditDescription('');
+            await fetchBoards();
+        } catch (err) {
+            setError((err as Error).message);
+        }
+    };
+
+    const startEditing = (board: any) => {
+        setEditingBoardId(board._id);
+        setEditTitle(board.title);
+        setEditDescription(board.description);
+    };
+
+    const cancelEditing = () => {
+        setEditingBoardId(null);
+        setEditTitle('');
+        setEditDescription('');
     };
 
     // Handle log out
@@ -167,17 +212,54 @@ export function BoardsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {boards.map((board) => (
                     <div key={board._id} className="bg-white p-6 rounded shadow hover:shadow-lg transition">
-                    <h3 className="text-lg font-bold text-gray-900">{board.title}</h3>
-                    <p className="text-gray-600 mb-4">{board.description}</p>
-                    <p className="text-sm text-gray-500 mb-4">Type: {board.type}</p>
-                    <button
-                        onClick={() => handleDeleteBoard(board._id)}
-                        className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition"
-                    >
-                        Delete
-                    </button>
+                        {editingBoardId === board._id ? (
+                        // Edit mode
+                        <form onSubmit={handleEditBoard}>
+                            <input
+                            type="text"
+                            value={editTitle}
+                            onChange={(e) => setEditTitle(e.target.value)}
+                            required
+                            className="w-full px-3 py-2 border rounded mb-2"
+                            />
+                            <textarea
+                            value={editDescription}
+                            onChange={(e) => setEditDescription(e.target.value)}
+                            className="w-full px-3 py-2 border rounded mb-2"
+                            />
+                            <button type="submit" className="px-3 py-1 bg-blue-500 text-white text-sm rounded mr-2">
+                            Save
+                            </button>
+                            <button
+                            type="button"
+                            onClick={cancelEditing}
+                            className="px-3 py-1 bg-gray-500 text-white text-sm rounded"
+                            >
+                            Cancel
+                            </button>
+                        </form>
+                        ) : (
+                        // View mode
+                        <>
+                            <h3 className="text-lg font-bold text-gray-900">{board.title}</h3>
+                            <p className="text-gray-600 mb-4">{board.description}</p>
+                            <p className="text-sm text-gray-500 mb-4">Type: {board.type}</p>
+                            <button
+                            onClick={() => startEditing(board)}
+                            className="px-3 py-1 bg-blue-500 text-white text-sm rounded mr-2 hover:bg-blue-600"
+                            >
+                            Edit
+                            </button>
+                            <button
+                            onClick={() => handleDeleteBoard(board._id)}
+                            className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600"
+                            >
+                            Delete
+                            </button>
+                        </>
+                        )}
                     </div>
-                ))}
+                    ))}
                 </div>
             )}
             </div>
