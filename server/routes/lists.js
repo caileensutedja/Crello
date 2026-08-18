@@ -38,4 +38,26 @@ router.post('/:boardId/lists', authMiddleware, async (req, res) => {
     }
 });
 
+// GET /api/boards/:boardId/lists - Get the list
+router.get('/:boardId/lists', authMiddleware, async (req, res) => {
+    try {
+        const boardId = req.params.boardId
+        const userId = req.user.userId;
+
+        // Check if the user owns the board
+        const owner = await BoardMember.findOne({ boardId, userId });
+        if (!owner || owner.role !== 'owner') {
+            return res.status(403).json({ error: 'Only board owner can view the list' });
+        }
+
+        // Find all listMembers for this user
+        const lists = await List.find({ boardId }).sort({ position: 1 })
+
+        res.json(lists);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Something went wrong' });
+    }
+});
+
 module.exports = router;
