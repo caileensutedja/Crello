@@ -211,7 +211,11 @@ export function BoardsPage() {
                 /* Boards grid */
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {boards.map((board) => (
-                    <div key={board._id} className="bg-white p-6 rounded shadow hover:shadow-lg transition">
+                    <div 
+                        key={board._id} 
+                        className="bg-white p-6 rounded shadow hover:shadow-lg transition cursor-pointer"
+                        onClick={() => navigate(`/boards/${board._id}`)}
+                    >
                         {editingBoardId === board._id ? (
                         // Edit mode
                         <form onSubmit={handleEditBoard}>
@@ -245,13 +249,19 @@ export function BoardsPage() {
                             <p className="text-gray-600 mb-4">{board.description}</p>
                             <p className="text-sm text-gray-500 mb-4">Type: {board.type}</p>
                             <button
-                            onClick={() => startEditing(board)}
+                            onClick={(e) => {
+                                e.stopPropagation(); // Prevents navigation when clicking
+                                startEditing(board);
+                            }}
                             className="px-3 py-1 bg-blue-500 text-white text-sm rounded mr-2 hover:bg-blue-600"
                             >
                             Edit
                             </button>
                             <button
-                            onClick={() => handleDeleteBoard(board._id)}
+                            onClick={(e) => {
+                                e.stopPropagation(); // Prevents navigation when clicking
+                                handleDeleteBoard(board._id);
+                            }}
                             className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600"
                             >
                             Delete
