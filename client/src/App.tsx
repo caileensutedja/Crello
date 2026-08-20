@@ -4,6 +4,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { SignupPage } from './pages/SignupPage';
 import { LoginPage } from './pages/LoginPage';
 import { BoardsPage } from './pages/BoardsPage';
+import { BoardDetailedPage } from './pages/BoardDetailedPage';
 
 function App() {
   return (
@@ -11,21 +12,36 @@ function App() {
       <AuthProvider>
         <Routes>
           {/* Public routes */}
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/login" element={<LoginPage />} />
+          {/* Sign Up */}
+          <Route 
+            path="/signup" 
+            element={<SignupPage />} 
+          />
+          {/* Log In*/}
+          <Route 
+            path="/login" 
+            element={<LoginPage />} 
+          />
 
           {/* Protected routes */}
+          {/* Boards lists page */}
           <Route
             path="/boards"
-            element={
-              <ProtectedRoute>
-                <BoardsPage />
-              </ProtectedRoute>
+            element={<ProtectedRoute> <BoardsPage /> </ProtectedRoute>
             }
+          />
+          
+          {/* Boards detailed page */}
+          <Route
+            path="/boards/:boardId"
+            element={<ProtectedRoute> <BoardDetailedPage /></ProtectedRoute>}
           />
 
           {/* Redirect root to /boards */}
-          <Route path="/" element={<Navigate to="/boards" replace />} />
+          <Route 
+            path="/" 
+            element={<Navigate to="/boards" replace />} 
+          />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
