@@ -9,7 +9,7 @@ export function BoardDetailPage() {
 
     // State for the lists and the cards
     const [lists, setLists] = useState([]);
-    const [cards, setCards] = useState({}); // { listId: [cards] }
+    const [cards, setCards] = useState<{[key: string]: any}>({});
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -77,7 +77,37 @@ export function BoardDetailPage() {
     return (
         <div className="p-8">
         <h1 className="text-3xl font-bold mb-8">Board Detail</h1>
-        {/* TODO: Render lists and cards here */}
+
+        {/* Loading states */}
+        { isLoading && <p>Loading lists and cards...</p>}
+
+        {/* Error states */}
+        { error && <p className='text-red-500'>Error: {error}</p>}
+        
+        {/* Render lists and cards here */}
+        { !isLoading && !error && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {lists.map((list: any) => (
+                    <div key={list._id} className='bg-gray-100 p-4 rounded'>
+                    {/* List title */}
+                    <h2 className="font-bold text-lg mb-4">{list.title}</h2>
+
+                    {/* Cards in this list */}
+                    <div className="space-y-2">
+                        {/* Map each into individual cards */}
+                        {cards[list._id]?.map((card: any) => (
+                            <div key={card._id} className="bg-white p-2 rounded shadow">
+                                {/* Card title */}
+                                <h3>{card.title}</h3>
+                                {/* Card description */}
+                                {card.description && <p className="text-sm text-gray-600">{card.description}</p>}
+                            </div>
+                        ))}
+                    </div>
+                    </div>
+                ))}
+            </div>
+        )}
         </div>
     );
 }
